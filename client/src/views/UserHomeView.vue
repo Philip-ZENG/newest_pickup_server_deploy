@@ -186,21 +186,20 @@ export default {
       searchOrder: '',
       searchType: 'type',
       actInformation: [], // store the activity information
-      page: 1, // store the page number
+      page: 1, // store the current page number
       userInput: '', // store the user's input for searching
       userPage: null, // the page number user want to view
-      dateinput: new Date(),
-      minNum: null,
-      maxNum: null,
-      cardSelected: false,
-      chosenIndex: 0,
-      memberIdList: null,
-      managerName: null,
-      nowDate: '', // 当前日期
+      dateinput: new Date(), //the date the user want to search for
+      cardSelected: false, //indicate if a user click on one acitivty-card
+      chosenIndex: 0, // the index of the activity-card the user choose
+      memberIdList: null, //store the members ofa activity
+      managerName: null, //store the name of the manager of the activity
+      nowDate: '', // current date
     };
   },
 
   computed: {
+    //calculate the user ID
     userId() {
       return Number(this.$store.getters.getUserId);
     },
@@ -231,11 +230,6 @@ export default {
       }
       return res;
     },
-
-    shownMemberList() {
-      if (this.memberIdList === null) return [[0], [0]];
-      return this.memberIdList;
-    },
   },
 
   watch: {
@@ -246,10 +240,18 @@ export default {
   },
 
   methods: {
+    /**
+     * @description
+     * route to other page
+     */
     switchTo(path) {
       this.$router.push(path);
     },
 
+    /**
+     * @description
+     * if the user want to post a new proposal, this function checks whether the user has log in.
+     */
     tryPost() {
       if (this.userId === null || this.userId === 0) {
         alert('please first log in');
@@ -257,7 +259,19 @@ export default {
       } else this.switchTo('/activityCreation');
     },
 
-    //search for activity given certain type or title
+    /**
+     * @description 
+     * *search for activity given certain type or title
+     * @serverFilePath
+     * *server\homeServer.js
+     * @serverPort
+     * *http://54.172.232.138:4001/searchActivity
+     * @dataPost
+     * *searchType
+     * *userInput
+     * @dataGet
+     * *actInformation
+     */
     searchActivity() {
       axios
         .post('http://54.172.232.138:4001/searchActivity', {
@@ -272,7 +286,16 @@ export default {
         });
     },
 
-    //get activity infromation from database
+    /**
+     * @description 
+     * *get activity infromation from database for home page
+     * @serverFilePath
+     * *server\homeServer.js
+     * @serverPort
+     * *http://54.172.232.138:4001/getActivityInfo
+     * @dataGet
+     * *actInformation
+     */
     askInfo() {
       axios
         .post('http://54.172.232.138:4001/getActivityInfo', { today: this.dateToString(new Date()) })
@@ -284,7 +307,18 @@ export default {
         });
     },
 
-    //search for the activity on a certain day
+    /**
+     * @description 
+     * *search for the activity on a certain day
+     * @serverFilePath
+     * *server\homeServer.js
+     * @serverPort
+     * *http://54.172.232.138:4001/searchByDate
+     * @dataPost
+     * *dateInput
+     * @dataGet
+     * *actInformation
+     */
     searchByDate() {
       axios
         .post('http://54.172.232.138:4001/searchByDate', {
@@ -298,7 +332,10 @@ export default {
         });
     },
 
-    //change the Date() form variable to string form
+    /**
+     * @description 
+     * *change the Date() form variable to string form
+     */
     dateToString(date) {
       const year = date.getFullYear();
       let month = (date.getMonth() + 1).toString();
@@ -314,11 +351,22 @@ export default {
       return dateTime;
     },
 
-    //show detail information about the card the user are interested in
+    /**
+     * @description 
+     * *show detail information about the card the user are interested in
+     * @serverFilePath
+     * *server\homeServer.js
+     * @serverPort
+     * *http://54.172.232.138:4001/activityMember
+     * @dataPost
+     * *activity_id
+     * @dataGet
+     * *memberIdList
+     * *managerName
+     */
     showDetail(index) {
       this.chosenIndex = index;
       const act = Object(this.shownActivity[this.chosenIndex]);
-
       axios
         .post('http://54.172.232.138:4001/activityMember', { activity_id: act.activity_id })
         .then((response) => {
@@ -330,7 +378,17 @@ export default {
         });
       this.cardSelected = true;
     },
-    //sort the activity
+
+    /**
+     * @description 
+     * *sort the activity
+     * @serverFilePath
+     * *server\homeServer.js
+     * @serverPort
+     * *http://54.172.232.138:4001/MostRecent
+     * @dataGet
+     * *actInformation
+     */
     sortActivity() {
       axios
         .post('http://54.172.232.138:4001/MostRecent')
@@ -342,7 +400,17 @@ export default {
         });
     },
 
-    //for user to join a certain activity he/her is interested in
+    /**
+     * @description 
+     * *for user to join a certain activity he/her is interested in
+     * @serverFilePath
+     * *server\homeServer.js
+     * @serverPort
+     * *http://54.172.232.138:4001/joinActivity
+     * @dataPost
+     * *activity_id
+     * *user_id
+     */
     tryJoin() {
       if (this.userId === null || this.userId === 0) {
         alert('Please first login!');
@@ -363,6 +431,10 @@ export default {
       }
     },
 
+    /**
+     * @description 
+     * *check if a user is already involved in a activity
+     */
     memberIdCheck() {
       if (this.memberIdList[0][0] === this.userId) return true;
       for (var i = 0; i < this.memberIdList[1].length; i++) {
@@ -370,7 +442,11 @@ export default {
       }
       return false;
     },
-
+    
+    /**
+     * @description 
+     * *return the current time, update every 0.5 second
+     */
     currentTime() {
       setInterval(this.formatDate, 500);
     },
