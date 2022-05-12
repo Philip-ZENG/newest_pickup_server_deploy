@@ -162,16 +162,16 @@ export default {
 
   data() {
     return {
-      user_id: null,
-      type: null,
-      title: null,
-      number: null,
-      otherNumber: null,
-      description: null,
-      location: null,
-      typeSelected: false,
-      otherNumSelected: false,
-      dateinput: new Date(),
+      user_id: null, //store the user id
+      type: null, //store the type of the activity
+      title: null, //store the title of the activity
+      number: null, //store the number of members of the activity, we provide 2,3 and 4
+      otherNumber: null, //store the number of members of the activity if user want other number of members
+      description: null, //store the description of the activity
+      location: null, //store the location of the activity
+      typeSelected: false, //used to check if the user select one type
+      otherNumSelected: false, //used to check if the user want other number of members
+      dateinput: new Date(), //store the date of the activity
       hour: '00',
       min: '00',
       hours: [
@@ -205,6 +205,7 @@ export default {
   },
 
   computed: {
+    //return a list of location for a certain type of activitys
     locations() {
       const locs = [
         [
@@ -232,7 +233,7 @@ export default {
       if (this.type === 'Carpool') return locs[4];
       return [];
     },
-
+    //return the final number of members of the activity
     finalNumber() {
       if (this.otherNumSelected) {
         if (this.otherNumber === null) return null;
@@ -242,12 +243,12 @@ export default {
         return this.number;
       }
     },
-
+    //return the calculated time of the acitivity which is in the form of yyyy-mm-dd-hh-min
     finalTime() {
       // eslint-disable-next-line
       return this.dateToString(this.dateinput) + ' ' + this.hour + ':' + this.min;
     },
-
+    //return the warning message if the user dose not give enough information of the activity
     warningMessage() {
       if (this.type === null) return 'You need to give the activity type';
       if (this.title === null) return 'You need to give the activity title';
@@ -256,24 +257,50 @@ export default {
       if (this.description === null) return 'You need to give the activity description';
       return null;
     },
-
+    //get the user id
     userId() {
       return Number(this.$store.getters.getUserId);
     },
   },
 
   methods: {
+    /**
+     * @description 
+     * *get type input from user
+     */
     getType(t) {
       this.typeSelected = true;
       this.type = t;
     },
 
+    /**
+     * @description 
+     * *get number of member input from user
+     */
     getNumber(num) {
       this.number = Number(num);
       this.otherNumSelected = false;
       this.otherNumber = null;
     },
 
+    /**
+     * @description 
+     * *post a new PickUp proposal
+     * *will check if the user has logged in
+     * *and if the user provide enough information about the activity
+     * @serverFilePath
+     * *server\homeServer.js
+     * @serverPort
+     * *http://54.172.232.138:4001/postActivity
+     * @dataPost
+     * *title
+     * *time
+     * *location
+     * *description
+     * *number
+     * *type
+     * *user_id
+     */
     postActivity() {
       if (this.userId === null || this.userId === 0) {
         alert('Please first login');
@@ -304,6 +331,10 @@ export default {
       }
     },
 
+    /**
+     * @description 
+     * *change the Date() form variable into string form
+     */
     dateToString(date) {
       const year = date.getFullYear();
       let month = (date.getMonth() + 1).toString();
@@ -311,26 +342,32 @@ export default {
       let dateTime = '';
       if (month.length === 1) {
         // eslint-disable-next-line
-        month = '0' + month;
+        month = '0' + month; //add 0 to month if the month is of in range of 1-9
       }
       if (day.length === 1) {
         // eslint-disable-next-line
-        day = '0' + day;
+        day = '0' + day; //add 0 to day if the month is of in range of 1-9
       }
       // eslint-disable-next-line
       dateTime = year + '-' + month + '-' + day;
       return dateTime;
     },
 
+    /**
+     * @description 
+     * *route to other page
+     */
     switchTo(path) {
       this.$router.push(path);
     },
 
+    //ckeck if the type is chosen and this will effect the class of css sytle
     typeActive(t) {
       if (t === this.type) return true;
       return false;
     },
 
+    //ckeck if the number of members is chosen and this will effect the class of css sytle
     numberActive(n) {
       if (n === 'other') {
         if (this.otherNumSelected) return true;

@@ -34,7 +34,12 @@ connection.connect(function (err) {
   if (err) throw err;
 });
 
-//fetch available activity from database
+/**
+ * @description 
+ * *fetch available activity from database
+ * @returns
+ * *a list of activity information
+ */
 app.post("/getActivityInfo", function (req, res) {
   var q = "SELECT * FROM activity_info WHERE time > now();";
   connection.query({
@@ -46,7 +51,12 @@ app.post("/getActivityInfo", function (req, res) {
   });
 });
 
-//search for activity with certain title or type
+/**
+ * @description 
+ * *search for activity with certain title or type
+ * @returns
+ * *a list of activity information
+ */
 app.post("/searchActivity", function(req, res){
   var q = "SELECT * FROM activity_info WHERE " + req.body.searchType + " = ? AND time > now()";
   connection.query({
@@ -58,7 +68,12 @@ app.post("/searchActivity", function(req, res){
   });
 });
 
-//search for activity on a certain date
+/**
+ * @description 
+ * *search for activity on a certain date
+ * @returns
+ * *a list of activity information
+ */
 app.post("/searchByDate", function(req, res){
   var q = "SELECT * FROM activity_info where date(time) = ?;";
   connection.query({
@@ -70,7 +85,10 @@ app.post("/searchByDate", function(req, res){
   });
 });
 
-//post a new activity
+/**
+ * @description 
+ * *post a new activity and modify the database
+ */
 app.post("/postActivity", function(req, res){
   var q = "INSERT INTO activity_info(`title`, `time`, `location`, `description`, `max_capacity`, `quota_left`, `type`) " +
   "VALUES (?,?,?,?,?,?,?);";
@@ -100,7 +118,10 @@ app.post("/postActivity", function(req, res){
   });
 });
 
-//sort the activity
+/**
+ * @description 
+ * *sort the activity
+ */
 app.post('/MostRecent', function(req,res){
   var q = "SELECT * FROM activity_info WHERE time > now() ORDER BY `time`";
   connection.query(q, function(err, result){
@@ -109,7 +130,12 @@ app.post('/MostRecent', function(req,res){
   });
 });
 
-//get the members' user_id list of a certain activity 
+/**
+ * @description 
+ * *get the members' user_id list of a certain activity 
+ * @returns
+ * *a list of user id 
+ */
 function getMemberList(activity_id, callback){
   var q = "SELECT * FROM activity_user WHERE activity_id = ?";
   var members = [[], []];
@@ -126,7 +152,12 @@ function getMemberList(activity_id, callback){
   });
 }
 
-//get the profile information for a certain user
+/**
+ * @description 
+ * *get the name of mamager of a certain activity
+ * @returns
+ * *name of the manager of the activity
+ */
 function getManagerName(user_id, callback){
   var q = 'SELECT `user_name` from user_info WHERE user_id = ?';
   connection.query({
@@ -138,6 +169,13 @@ function getManagerName(user_id, callback){
   })
 }
 
+/**
+ * @description 
+ * *get the manager and member information of the activity
+ * @returns
+ * *name of the manager of the activity
+ * *member list of the activity
+ */
 async function pack_profile_info(activity_id){
   var myPromise1 = function(activity_id){
     return new Promise(function(resolve){
@@ -161,7 +199,10 @@ async function pack_profile_info(activity_id){
   return pack;
 }
 
-//return the members' profile information
+/**
+ * @description 
+ * *return manager and member information to the frontend
+ */
 app.post('/activityMember', function(req, res){
   pack_profile_info(req.body.activity_id)
     .then(response => {
@@ -172,7 +213,12 @@ app.post('/activityMember', function(req, res){
     });
 });
 
-//user can join activity 
+/**
+ * @description 
+ * *update the database when user try to join a activity
+ * *tables manipulated:
+ * *activity_user & activity_info
+ */
 app.post('/joinActivity', function(req, res){
   var q1 = "INSERT INTO activity_user VALUES(?,?,'MEMBER')";
   connection.query({
