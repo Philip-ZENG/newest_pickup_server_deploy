@@ -53,6 +53,10 @@ app.post("/upload", upload.single("image"), async (req,res)=>{
   })
 })
 
+/**
+ * @description 
+ * * get the profile and send the base64 foramt picture
+ */
 
 app.post("/getProfile", (req, res) => {
   const profilePath = path.join(__dirname, "./public/img/" + req.body.user_id + ".png")
@@ -69,6 +73,12 @@ app.post("/getProfile", (req, res) => {
   // const base64 = fs.readFileSync(profilePath, 'base64') // 文件流并转 base64
   // res.send(base64);
 })
+
+/**
+ * @description 
+ * * get the user information from the database
+ * * send the result
+ */
 
 function getUserInfo(user_id, callback) {
     connection.query({
