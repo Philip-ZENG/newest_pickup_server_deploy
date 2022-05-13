@@ -114,6 +114,7 @@ export default {
     return {
       user_id: null,
       USER_DATA_INDEX: 0,
+      // the userData is to store the information from the server
       userData: [
         {
           user_id: null,
@@ -124,10 +125,19 @@ export default {
           personal_intro: null,
         },
       ],
+      // store the url of the picture
       url: null,
     };
   },
   methods: {
+    /**
+     * @description 
+     * * get user infromation from database for user information page
+     * @serverFilePath
+     * * server\profileAndSetting.js
+     * @dataGet
+     * * userData
+     */
     getUserInfo() {
       const that = this;
       axios
@@ -167,7 +177,7 @@ export default {
       });
     },
   },
-
+// * two methods will be called once the web page is launched
   mounted() {
     this.getUserInfo();
     this.getProfile();

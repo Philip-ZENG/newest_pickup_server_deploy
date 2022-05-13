@@ -38,6 +38,7 @@ var person = {
 
 var rand,mailOptions,host,link;
 
+// set the email service to the send emails to user's email
 var smtpTransport = nodemailer.createTransport({
   service: "QQ",
   auth: {
@@ -54,6 +55,10 @@ connection.connect(function (err) {
 
 // Post route (Client post something to the server)
 // This route is called when server receives something from the client
+/**
+ * @description 
+ * * get the email and password from front end and send a email to the user
+ */
 app.post("/register", function (req, res) {
   console.log("able to step in");
   // Obtain the client side info with the help of body-parser package
@@ -61,10 +66,13 @@ app.post("/register", function (req, res) {
   person.password = req.body.password;
 
   // Insert the data into database, the syntax comes from the mysql.js package
+  // * create a random verification code to verify
   rand=Math.floor((Math.random() * 100) + 54);
   host=req.get('host');
   console.log(host);
   link="http://"+req.get('host')+"/verify?id="+rand;
+
+  // * set the target email
   mailOptions={
       from: "2316293336@qq.com",
       to : person.email,
@@ -84,6 +92,13 @@ app.post("/register", function (req, res) {
   });
   console.log(person);
 });
+
+/**
+ * @description 
+ * * verify the verification code in the server is the same as the 
+ * * verification code in the email
+ * * if it is true, store the email and password into the data base
+ */
 
 app.get('/verify', function(req,res){
 
@@ -126,6 +141,14 @@ app.get('/verify', function(req,res){
     }
 });
 
+/**
+ * @description 
+ * * check the password from the front end 
+ * * is the same as the password in the data base
+ * * if it is true
+ * @return
+ * * the match result and the user_id
+ */
 
 function userLogin(email, password, callback) {
   connection.query({
