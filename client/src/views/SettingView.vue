@@ -134,35 +134,43 @@ const SETTING_BIO_URL = 'http://54.172.232.138:4004/setting/bio';
 export default {
   data() {
     return {
-      originPassword: null,
-      password: null,
-      userName: '',
-      Bio: '',
-      contact: '',
-      passwordVerify: '',
-      alert: '',
-      gender: '',
+      originPassword: null, // the originPassword gets from the input box
+      password: null, // the new gets from the input box
+      userName: '', // the new username gets from the input box
+      Bio: '', // the updated biography gets from the input box
+      contact: '', // the new contact information gets from the input box
+      passwordVerify: '', // the verify new password
+      alert: '', // the alert information if the new password and the verify password is different
+      gender: '', // the new gender information gets from the input box
     };
   },
 
   computed: {
     userId() {
-      return Number(this.$store.getters.getUserId);
+      return Number(this.$store.getters.getUserId); // to get the user_id of the current user from the server
     },
   },
 
   methods: {
     checkAndResetPassword() {
       this.alert = '';
-
+// check whether the new password and verify password is the same
       if (this.password !== this.passwordVerify) {
         this.alert = 'Passwords must match';
       }
     },
-
+    /**
+     * @description 
+     * * upload the new data to the server if the operation is allowed
+     * @serverFilePath
+     * * server\profileAndSetting.js
+     * @dataGet
+     * * new Password
+     */
     updatePassword() {
       const keyword = this.password;
       const id = this.$store.getters.getUserId;
+      // send the new password and user_id to the server
       axios.post(SETTING_PASSWORD_URL, { password: keyword, user_id: id }).then((response) => {
         if (response.data.succeed) {
           alert('Password successfully chaged!');
